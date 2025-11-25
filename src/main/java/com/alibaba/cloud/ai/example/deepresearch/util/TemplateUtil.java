@@ -60,6 +60,17 @@ public class TemplateUtil {
 		return systemMessage;
 	}
 
+    public static Message getShortMemoryExtractMessage(OverAllState state, String query, String historyUserMessages) throws IOException {
+        // 读取 短期记忆抽取 md 文件
+        ClassPathResource resource = new ClassPathResource("prompts/memory/short/shortmemory-extract.md");
+        String template = StreamUtils.copyToString(resource.getInputStream(), StandardCharsets.UTF_8);
+        // 替换 {{ last_user_message }} 占位符
+        String systemPrompt = template.replace("{{ last_user_message }}", query);
+        // 替换 {{ history_user_messages }} 占位符
+        systemPrompt = systemPrompt.replace("{{ history_user_messages }}", historyUserMessages);
+        return new SystemMessage(systemPrompt);
+    }
+
 	public static Message getOptQueryMessage(OverAllState state) throws IOException {
 		List<String> queries = StateUtil.getOptimizeQueries(state);
 		assert queries != null && !queries.isEmpty();

@@ -212,7 +212,7 @@ public class DeepResearchConfiguration {
 
 		StateGraph stateGraph = new StateGraph("deep research", keyStrategyFactory,
 				new DeepResearchStateSerializer(OverAllState::new))
-            .addNode("short_user_role_memory", node_async(new ShortUserRoleMemoryNode(shortMemoryAgent)))
+            .addNode("short_user_role_memory", node_async(new ShortUserRoleMemoryNode(shortMemoryAgent, sessionContextService)))
 			.addNode("coordinator", node_async(new CoordinatorNode(coordinatorAgent, sessionContextService)))
 			.addNode("rewrite_multi_query",
 					node_async(new RewriteAndMultiQueryNode(rewriteAndMultiQueryChatClientBuilder)))
