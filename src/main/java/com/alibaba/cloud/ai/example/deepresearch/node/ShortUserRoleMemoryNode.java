@@ -37,6 +37,8 @@ public class ShortUserRoleMemoryNode implements NodeAction {
 
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
+    private static final String ZONE_ASIA_SHANGHAI = "Asia/Shanghai";
+
     private static final String USER_ID = "MOCK_USER_ID";
 
     private final ChatClient shortMemoryAgent;
@@ -146,7 +148,7 @@ public class ShortUserRoleMemoryNode implements NodeAction {
     private void fillResult(OverAllState state, ShortUserRoleExtractResult result) {
         result.setUserId(USER_ID);
         result.setConversationId(StateUtil.getSessionId(state));
-        result.setCreatTime(LocalDateTime.now(ZoneId.of("Asia/Shanghai")).format(DATE_TIME_FORMATTER));
+        result.setCreatTime(LocalDateTime.now(ZoneId.of(ZONE_ASIA_SHANGHAI)).format(DATE_TIME_FORMATTER));
     }
 
     /**
@@ -168,7 +170,7 @@ public class ShortUserRoleMemoryNode implements NodeAction {
         ShortUserRoleExtractResult latestExtract = JsonUtil.fromJson(historyShortResult.getText(), ShortUserRoleExtractResult.class);
         Double latestConfidence = Objects.requireNonNull(latestExtract).getConversationAnalysis().getConfidenceScore();
         Double currentConfidence = currentResult.getConversationAnalysis().getConfidenceScore();
-        // 如果当前结果的置信度更高，融合历史用户角色信息后更新短期记忆
+        // 如果当前结果的置信度更高，融合历史用户角色信息后更新短期记忆，是否真正融合需要由LLM结合历史判定
         if (currentConfidence > latestConfidence) {
             return mergeAndUpdateShortTermMemory(state, currentResult, latestExtract);
         }
@@ -186,16 +188,21 @@ public class ShortUserRoleMemoryNode implements NodeAction {
      */
     private ShortUserRoleExtractResult mergeAndUpdateShortTermMemory(OverAllState state, ShortUserRoleExtractResult current,
                                                                      ShortUserRoleExtractResult latest) throws IOException {
+        List<Message> messageTrack = shortTermMemoryRepository.findMessageTrack(USER_ID, StateUtil.getSessionId(state));
+        List<ShortUserRoleExtractResult> historyTracks = new ArrayList<>();
+        if (!CollectionUtils.isEmpty(messageTrack)) {
+            messageTrack.stream().map(message -> converter.convert(message.getText())).forEach(historyTracks::add);
+        }
         // 组装update prompt消息
         List<Message> updateMessages = Collections.singletonList(
-                TemplateUtil.getShortMemoryUpdateMessage(current, latest)
+                TemplateUtil.getShortMemoryUpdateMessage(current, latest, historyTracks)
         );
         ChatResponse updateResponse = callShortMemoryAgent(updateMessages);
         String updateText = updateResponse.getResult().getOutput().getText();
         assert updateText != null;
         ShortUserRoleExtractResult mergedResult = converter.convert(updateText);
         assert mergedResult != null;
-        mergedResult.setUpdateTime(LocalDateTime.now(ZoneId.of("Asia/Shanghai")).format(DATE_TIME_FORMATTER));
+        mergedResult.setUpdateTime(LocalDateTime.now(ZoneId.of(ZONE_ASIA_SHANGHAI)).format(DATE_TIME_FORMATTER));
         SystemMessage mergedMemory = new SystemMessage(JsonUtil.toJson(mergedResult));
         shortTermMemoryRepository.saveOrUpdate(USER_ID, StateUtil.getSessionId(state), Collections.singletonList(mergedMemory));
         return mergedResult;

@@ -25,12 +25,9 @@ import com.alibaba.cloud.ai.example.deepresearch.service.SearchFilterService;
 import com.alibaba.cloud.ai.example.deepresearch.service.SearchInfoService;
 import com.alibaba.cloud.ai.example.deepresearch.service.multiagent.SmartAgentDispatcherService;
 import com.alibaba.cloud.ai.example.deepresearch.service.multiagent.SmartAgentSelectionHelperService;
+import com.alibaba.cloud.ai.example.deepresearch.util.*;
 import com.alibaba.cloud.ai.example.deepresearch.util.convert.FluxConverter;
 import com.alibaba.cloud.ai.example.deepresearch.util.multiagent.AgentIntegrationUtil;
-import com.alibaba.cloud.ai.example.deepresearch.util.NodeStepTitleUtil;
-import com.alibaba.cloud.ai.example.deepresearch.util.ReflectionProcessor;
-import com.alibaba.cloud.ai.example.deepresearch.util.ReflectionUtil;
-import com.alibaba.cloud.ai.example.deepresearch.util.StateUtil;
 import com.alibaba.cloud.ai.graph.GraphResponse;
 import com.alibaba.cloud.ai.graph.OverAllState;
 import com.alibaba.cloud.ai.graph.action.NodeAction;
@@ -120,7 +117,7 @@ public class ResearcherNode implements NodeAction {
 		try {
 			// Build task messages
 			List<Message> messages = new ArrayList<>();
-
+            TemplateUtil.addShortUserRoleMemory(messages, state);
 			// Build task message with reflection history
 			String originTaskContent = buildTaskMessage(assignedStep);
 			String taskContent = buildTaskMessageWithReflectionHistory(assignedStep);

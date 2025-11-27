@@ -38,7 +38,7 @@ interface ConversationAnalysis {
 interface IdentifiedRole {
   possibleOccupations : string[]; // List of possible occupations
   primaryCharacteristics: string[]; // Main character feature tags
-  evidenceSummary: string; // Summary of identification basis
+  evidenceSummary: string[]; // Summary of identification basis
   confidenceLevel: 'low' | 'medium' | 'medium_high' | 'high'; // Confidence level  
 }
 
@@ -66,7 +66,7 @@ Sample output:
   "identifiedRole": {
     "possibleOccupations": ["software_engineer", "system_architect"],
     "primaryCharacteristics": ["technical_detailed", "architecture_focused"],
-    "evidenceSummary": "Used microservices terminology, requested implementation details",
+    "evidenceSummary": ["Used microservices terminology, requested implementation details"],
     "confidenceLevel": "medium_high"
   },
   "communicationPreferences": {

@@ -24,6 +24,7 @@ import com.alibaba.cloud.ai.example.deepresearch.model.req.GraphId;
 import com.alibaba.cloud.ai.example.deepresearch.service.ReportService;
 import com.alibaba.cloud.ai.example.deepresearch.service.SessionContextService;
 import com.alibaba.cloud.ai.example.deepresearch.util.StateUtil;
+import com.alibaba.cloud.ai.example.deepresearch.util.TemplateUtil;
 import com.alibaba.cloud.ai.example.deepresearch.util.convert.FluxConverter;
 import com.alibaba.cloud.ai.graph.GraphResponse;
 import com.alibaba.cloud.ai.graph.OverAllState;
@@ -82,7 +83,7 @@ public class ReporterNode implements NodeAction {
 
 		// 添加消息
 		List<Message> messages = new ArrayList<>();
-
+        TemplateUtil.addShortUserRoleMemory(messages, state);
 		// 添加背景调查的信息
 		List<String> backgroundInvestigationResults = state.value("background_investigation_results",
 				(List<String>) null);

@@ -26,7 +26,7 @@ public class IdentifiedRole {
      * 角色特征证据摘要
      */
     @JsonProperty("evidenceSummary")
-    private String evidenceSummary;
+    private List<String> evidenceSummary;
 
     /**
      * 置信度等级
@@ -50,11 +50,11 @@ public class IdentifiedRole {
         this.confidenceLevel = confidenceLevel;
     }
 
-    public String getEvidenceSummary() {
+    public List<String> getEvidenceSummary() {
         return evidenceSummary;
     }
 
-    public void setEvidenceSummary(String evidenceSummary) {
+    public void setEvidenceSummary(List<String> evidenceSummary) {
         this.evidenceSummary = evidenceSummary;
     }
 

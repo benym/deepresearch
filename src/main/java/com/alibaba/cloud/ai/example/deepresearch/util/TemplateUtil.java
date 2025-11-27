@@ -23,6 +23,7 @@ import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.util.StreamUtils;
+import org.springframework.util.StringUtils;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -73,15 +74,17 @@ public class TemplateUtil {
     }
 
     public static Message getShortMemoryUpdateMessage(ShortUserRoleExtractResult currentExtractResult,
-                                                      ShortUserRoleExtractResult previousExtractResult) throws IOException {
+                                                      ShortUserRoleExtractResult previousExtractResult,
+                                                      List<ShortUserRoleExtractResult> historyExtractTracks) throws IOException {
         // 读取 短期记忆更新 md 文件
         ClassPathResource resource = new ClassPathResource("prompts/memory/short/shortmemory-update.md");
         String template = StreamUtils.copyToString(resource.getInputStream(), StandardCharsets.UTF_8);
         // 替换 {{ current_extract_result }} 占位符
         String systemPrompt = template.replace("{{ current_extract_result }}", JsonUtil.toJson(currentExtractResult));
         // 替换 {{ previous_extract_results }} 占位符
-        String previousResultsJson = JsonUtil.toJson(previousExtractResult);
-        systemPrompt = systemPrompt.replace("{{ previous_extract_results }}", previousResultsJson);
+        systemPrompt = systemPrompt.replace("{{ previous_extract_results }}", JsonUtil.toJson(previousExtractResult));
+        // 替换 {{ history_tracks }} 占位符
+        systemPrompt = systemPrompt.replace("{{ history_extract_track }}", JsonUtil.toJson(historyExtractTracks));
         return new SystemMessage(systemPrompt);
     }
 
@@ -97,5 +100,15 @@ public class TemplateUtil {
 		Message userMessage = new UserMessage(String.valueOf(results));
 		return userMessage;
 	}
+
+    public static void addShortUserRoleMemory(List<Message> messages, OverAllState state) {
+        String shortUserRoleMemory = state.value("short_user_role_memory", "");
+        if (StringUtils.hasText(shortUserRoleMemory)) {
+            ShortUserRoleExtractResult shortUserRoleExtractResult = JsonUtil.fromJson(shortUserRoleMemory, ShortUserRoleExtractResult.class);
+            if (shortUserRoleExtractResult!=null) {
+                messages.add(new UserMessage("You are having a conversation with " + shortUserRoleExtractResult.getUserOverview()));
+            }
+        }
+    }
 
 }
