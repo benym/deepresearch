@@ -246,9 +246,4 @@ public class AgentsConfiguration {
 		return shortMemoryChatClientBuilder.build();
 	}
 
-	@Bean
-	public ChatClient longMemoryAgent(ChatClient.Builder longMemoryChatClientBuilder) {
-		return longMemoryChatClientBuilder.build();
-	}
-
 }
