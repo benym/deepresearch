@@ -226,7 +226,7 @@ public class DeepResearchConfiguration {
 							shortTermMemoryRepository)))
 			.addNode("coordinator", node_async(new CoordinatorNode(coordinatorAgent, sessionContextService, messageWindowChatMemory)))
 			.addNode("rewrite_multi_query",
-					node_async(new RewriteAndMultiQueryNode(rewriteAndMultiQueryChatClientBuilder)))
+					node_async(new RewriteAndMultiQueryNode(rewriteAndMultiQueryChatClientBuilder, shortTermMemoryRepository, shortTermMemoryProperties)))
 			.addNode("background_investigator",
 					node_async(new BackgroundInvestigationNode(jinaCrawlerService, infoCheckService,
 							searchFilterService, questionClassifierService, searchPlatformSelectionService,

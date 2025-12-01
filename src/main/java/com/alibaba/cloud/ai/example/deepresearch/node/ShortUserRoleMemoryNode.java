@@ -105,7 +105,7 @@ public class ShortUserRoleMemoryNode implements NodeAction {
 			metaData.put("create_time", LocalDateTime.now(ZoneId.of(ZONE_ASIA_SHANGHAI)));
 			UserMessage userMessage = UserMessage.builder().text(StateUtil.getQuery(state)).metadata(metaData).build();
 			shortTermMemoryRepository.saveUserQuery(StateUtil.getSessionId(state),
-					Collections.singletonList(userMessage));
+					new ArrayList<>(Collections.singletonList(userMessage)));
 			return "";
 		}
 		StringBuilder historyUserMessages = new StringBuilder();
@@ -173,7 +173,7 @@ public class ShortUserRoleMemoryNode implements NodeAction {
 		if (historyShortResult == null) {
 			SystemMessage newShortMemory = new SystemMessage(JsonUtil.toJson(currentResult));
 			shortTermMemoryRepository.saveOrUpdate(USER_ID, StateUtil.getSessionId(state),
-					Collections.singletonList(newShortMemory));
+					new ArrayList<>(Collections.singleton(newShortMemory)));
 			return currentResult;
 		}
 		ShortUserRoleExtractResult latestExtract = converter.convert(historyShortResult.getText());
@@ -213,7 +213,7 @@ public class ShortUserRoleMemoryNode implements NodeAction {
 		mergedResult.setUpdateTime(LocalDateTime.now(ZoneId.of(ZONE_ASIA_SHANGHAI)).format(DATE_TIME_FORMATTER));
 		SystemMessage mergedMemory = new SystemMessage(JsonUtil.toJson(mergedResult));
 		shortTermMemoryRepository.saveOrUpdate(USER_ID, StateUtil.getSessionId(state),
-				Collections.singletonList(mergedMemory));
+                new ArrayList<>(Collections.singleton(mergedMemory)));
 		return mergedResult;
 	}
 
