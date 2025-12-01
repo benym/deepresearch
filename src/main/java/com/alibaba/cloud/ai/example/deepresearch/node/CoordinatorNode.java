@@ -25,10 +25,12 @@ import com.alibaba.cloud.ai.graph.action.NodeAction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.memory.MessageWindowChatMemory;
 import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatResponse;
+import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -51,9 +53,12 @@ public class CoordinatorNode implements NodeAction {
 
 	private final SessionContextService sessionContextService;
 
-	public CoordinatorNode(ChatClient coordinatorAgent, SessionContextService sessionContextService) {
+    private final MessageWindowChatMemory messageWindowChatMemory;
+
+	public CoordinatorNode(ChatClient coordinatorAgent, SessionContextService sessionContextService, MessageWindowChatMemory messageWindowChatMemory) {
 		this.coordinatorAgent = coordinatorAgent;
 		this.sessionContextService = sessionContextService;
+        this.messageWindowChatMemory = messageWindowChatMemory;
 	}
 
 	@Override
@@ -65,21 +70,17 @@ public class CoordinatorNode implements NodeAction {
 		TemplateUtil.addShortUserRoleMemory(messages, state);
 		messages.add(TemplateUtil.getMessage("coordinator"));
 
-		// 添加前几次同一会话的报告
+		// 添加历史消息UserMessage和AssistantMessage交替
 		String sessionId = StateUtil.getSessionId(state);
-		List<SessionHistory> reports = sessionContextService.getRecentReports(sessionId);
-		Message lastReportMessage;
-		if (reports != null && !reports.isEmpty()) {
-			lastReportMessage = new AssistantMessage("这是用户前几次使用DeepResearch的报告：\r\n"
-					+ reports.stream().map(SessionHistory::toString).collect(Collectors.joining("\r\n\r\n")));
-		}
-		else {
-			lastReportMessage = new AssistantMessage("这是用户的第一次询问，因此没有上下文。");
-		}
-		messages.add(lastReportMessage);
+        List<Message> sessionHistoryMemory = messageWindowChatMemory.get(sessionId);
+        if (!CollectionUtils.isEmpty(sessionHistoryMemory)) {
+            messages.addAll(sessionHistoryMemory);
+        }
 
 		// 1.2 添加用户提问
-		messages.add(new UserMessage(StateUtil.getQuery(state)));
+        UserMessage userMessage = new UserMessage(StateUtil.getQuery(state));
+        messageWindowChatMemory.add(sessionId, userMessage);
+        messages.add(userMessage);
 		logger.debug("Current Coordinator messages: {}", messages);
 
 		// 发起调用并获取完整响应
@@ -101,7 +102,9 @@ public class CoordinatorNode implements NodeAction {
 		else {
 			logger.warn("❌ 未触发工具调用");
 			logger.debug("Coordinator response: {}", response.getResult());
-			updated.put("output", assistantMessage.getText());
+            AssistantMessage output = response.getResult().getOutput();
+            messageWindowChatMemory.add(sessionId, output);
+            updated.put("output", assistantMessage.getText());
 		}
 		updated.put("coordinator_next_node", nextStep);
 		updated.put("deep_research", deepResearch);

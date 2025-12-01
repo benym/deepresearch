@@ -70,6 +70,8 @@ public class TemplateUtil {
 		String systemPrompt = template.replace("{{ last_user_message }}", query);
 		// 替换 {{ history_user_messages }} 占位符
 		systemPrompt = systemPrompt.replace("{{ history_user_messages }}", historyUserMessages);
+        // 替换 {{ locale }} 占位符
+        systemPrompt = systemPrompt.replace("{{ locale }}", "zh-CN");
 		return new SystemMessage(systemPrompt);
 	}
 
@@ -107,7 +109,7 @@ public class TemplateUtil {
 			ShortUserRoleExtractResult shortUserRoleExtractResult = JsonUtil.fromJson(shortUserRoleMemory,
 					ShortUserRoleExtractResult.class);
 			if (shortUserRoleExtractResult != null) {
-				messages.add(new UserMessage(
+				messages.add(new SystemMessage(
 						"You are having a conversation with " + shortUserRoleExtractResult.getUserOverview()));
 			}
 		}

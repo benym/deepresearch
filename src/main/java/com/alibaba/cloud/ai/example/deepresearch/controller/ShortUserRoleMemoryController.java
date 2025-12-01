@@ -3,6 +3,7 @@ package com.alibaba.cloud.ai.example.deepresearch.controller;
 import com.alibaba.cloud.ai.example.deepresearch.memory.ShortTermMemoryRepository;
 import com.alibaba.cloud.ai.example.deepresearch.model.ApiResponse;
 import jakarta.annotation.Resource;
+import org.springframework.ai.chat.memory.MessageWindowChatMemory;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,6 +19,20 @@ public class ShortUserRoleMemoryController {
 
 	@Resource
 	private ShortTermMemoryRepository shortTermMemoryRepository;
+
+    @Resource
+    private MessageWindowChatMemory messageWindowChatMemory;
+
+    /**
+     * 获取会话历史消息
+     * @param sessionId 会话Id
+     * @return ResponseEntity<ApiResponse<List<Message>>>
+     */
+    @GetMapping("/conversation")
+    public ResponseEntity<ApiResponse<List<Message>>> getConversationHistory(@RequestParam("session_id") String sessionId){
+        List<Message> messages = messageWindowChatMemory.get(sessionId);
+        return ResponseEntity.ok(ApiResponse.success(messages));
+    }
 
 	/**
 	 * 获取用户角色抽取短期记忆轨迹

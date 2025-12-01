@@ -45,6 +45,7 @@ import com.alibaba.cloud.ai.toolcalling.jinacrawler.JinaCrawlerService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.memory.MessageWindowChatMemory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -110,6 +111,9 @@ public class DeepResearchConfiguration {
 
 	@Autowired
 	private ShortTermMemoryRepository shortTermMemoryRepository;
+
+    @Autowired
+    private MessageWindowChatMemory messageWindowChatMemory;
 
 	@Autowired(required = false)
 	private JinaCrawlerService jinaCrawlerService;
@@ -220,7 +224,7 @@ public class DeepResearchConfiguration {
 			.addNode("short_user_role_memory",
 					node_async(new ShortUserRoleMemoryNode(shortMemoryAgent, shortTermMemoryProperties,
 							shortTermMemoryRepository)))
-			.addNode("coordinator", node_async(new CoordinatorNode(coordinatorAgent, sessionContextService)))
+			.addNode("coordinator", node_async(new CoordinatorNode(coordinatorAgent, sessionContextService, messageWindowChatMemory)))
 			.addNode("rewrite_multi_query",
 					node_async(new RewriteAndMultiQueryNode(rewriteAndMultiQueryChatClientBuilder)))
 			.addNode("background_investigator",
@@ -236,7 +240,7 @@ public class DeepResearchConfiguration {
 			.addNode("human_feedback", node_async(new HumanFeedbackNode()))
 			.addNode("research_team", node_async(new ResearchTeamNode()))
 			.addNode("parallel_executor", node_async(new ParallelExecutorNode(deepResearchProperties)))
-			.addNode("reporter", node_async(new ReporterNode(reporterAgent, reportService, sessionContextService)));
+			.addNode("reporter", node_async(new ReporterNode(reporterAgent, reportService, sessionContextService, messageWindowChatMemory)));
 
 		// 添加并行节点块
 		configureParallelNodes(stateGraph);

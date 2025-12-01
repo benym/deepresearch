@@ -34,6 +34,8 @@ import com.alibaba.cloud.ai.graph.streaming.StreamingOutput;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.memory.MessageWindowChatMemory;
+import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatResponse;
@@ -62,13 +64,16 @@ public class ReporterNode implements NodeAction {
 
 	private final SessionContextService sessionContextService;
 
+    private final MessageWindowChatMemory messageWindowChatMemory;
+
 	private static final String RESEARCH_FORMAT = "# Research Requirements\n\n## Task\n\n{0}\n\n## Description\n\n{1}";
 
 	public ReporterNode(ChatClient reporterAgent, ReportService reportService,
-			SessionContextService sessionContextService) {
+                        SessionContextService sessionContextService, MessageWindowChatMemory messageWindowChatMemory) {
 		this.reporterAgent = reporterAgent;
 		this.reportService = reportService;
 		this.sessionContextService = sessionContextService;
+        this.messageWindowChatMemory = messageWindowChatMemory;
 	}
 
 	@Override
@@ -135,6 +140,7 @@ public class ReporterNode implements NodeAction {
 				try {
 					GraphId graphId = new GraphId(sessionId, threadId);
 					String userQuery = state.value("query", String.class).orElse("UNKNOWN");
+                    messageWindowChatMemory.add(sessionId, new AssistantMessage(finalReport));
 					sessionContextService.addSessionHistory(graphId,
 							SessionHistory.builder().graphId(graphId).userQuery(userQuery).report(finalReport).build());
 					logger.info("Report saved successfully, Thread ID: {}", threadId);

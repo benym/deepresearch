@@ -47,12 +47,12 @@ Current Extract Memory
     "possibleIdentities" : [ "software_engineer", "system_architect" ],
     "primaryCharacteristics" : [ "technical_detailed", "architecture_focused" ],
     "evidenceSummary" : ["Asked about high concurrency in a Spring Boot-based e-commerce system, indicating technical depth and architectural focus"],
-    "confidenceLevel" : "high"
+    "confidenceLevel" : "HIGH"
   },
   "communicationPreferences" : {
-    "contentDepth" : "practical",
-    "detailLevel" : "balance",
-    "responseFormat" : "structured_with_examples"
+    "contentDepth" : "PRACTICAL",
+    "detailLevel" : "BALANCE",
+    "responseFormat" : "STRUCTURED_WITH_EXAMPLES"
   },
   "userOverview" : "A software engineer or system architect with technical depth and architectural focus seeking practical, structured solutions for high concurrency in a Spring Boot-based e-commerce system"
 }
@@ -68,12 +68,12 @@ Previous Extract Memory
     "possibleIdentities": ["engineer", "system_architect"],
     "primaryCharacteristics": ["technical_detailed", "architecture_focused"],
     "evidenceSummary": ["Used microservices terminology, requested implementation details"],
-    "confidenceLevel": "medium_high"
+    "confidenceLevel": "MEDIUM_HIGH"
   },
   "communicationPreferences": {
-    "detailLevel": "comprehensive",
-    "contentDepth": "practical",
-    "responseFormat": "structured_with_examples"
+    "detailLevel": "COMPREHENSIVE",
+    "contentDepth": "PRACTICAL",
+    "responseFormat": "STRUCTURED_WITH_EXAMPLES"
   },
   "userOverview" : "A senior software engineer or system architect who prefers comprehensive, practical details delivered in structured formats with examples, demonstrating technical depth and architectural focus"
 }
@@ -90,12 +90,12 @@ Sample output:
     "possibleIdentities": ["software_engineer", "system_architect"],
     "primaryCharacteristics": ["technical_detailed", "architecture_focused"],
     "evidenceSummary": ["Used microservices terminology, requested implementation details", "Asked about high concurrency in a Spring Boot-based e-commerce system, indicating technical depth and architectural focus"],
-    "confidenceLevel": "high"
+    "confidenceLevel": "HIGH"
   },
   "communicationPreferences": {
-    "detailLevel": "comprehensive",
-    "contentDepth": "practical", 
-    "responseFormat": "structured_with_examples"
+    "detailLevel": "COMPREHENSIVE",
+    "contentDepth": "PRACTICAL", 
+    "responseFormat": "STRUCTURED_WITH_EXAMPLES"
   },
   "userOverview": "A senior software engineer or system architect with technical depth and architectural focus, seeking comprehensive, practical details delivered in structured formats with examples, particularly interested in high concurrency solutions for Spring Boot-based e-commerce systems"
 }
@@ -116,9 +116,9 @@ Current Extract Memory
     "confidenceLevel" : "HIGH"
   },
   "communicationPreferences" : {
-    "contentDepth" : "practical",
-    "detailLevel" : "balance",
-    "responseFormat" : "structured_with_examples"
+    "contentDepth" : "PRACTICAL",
+    "detailLevel" : "BALANCE",
+    "responseFormat" : "STRUCTURED_WITH_EXAMPLES"
   },
   "userOverview" : "A parent seeking a practical recipe for their child, preferring balanced details with structured examples"
 }
@@ -134,12 +134,12 @@ Previous Extract Memory
     "possibleIdentities": ["software_engineer", "system_architect"],
     "primaryCharacteristics": ["technical_detailed", "architecture_focused"],
     "evidenceSummary": ["Used microservices terminology, requested implementation details"],
-    "confidenceLevel": "medium_high"
+    "confidenceLevel": "MEDIUM_HIGH"
   },
   "communicationPreferences": {
-    "detailLevel": "comprehensive",
-    "contentDepth": "practical",
-    "responseFormat": "structured_with_examples"
+    "detailLevel": "COMPREHENSIVE",
+    "contentDepth": "PRACTICAL",
+    "responseFormat": "STRUCTURED_WITH_EXAMPLES"
   },
   "userOverview" : "A senior software engineer or system architect who prefers comprehensive, practical details delivered in structured formats with examples, demonstrating technical depth and architectural focus"
 }
@@ -156,12 +156,12 @@ History Extract Track
       "possibleIdentities": ["software_engineer"],
       "primaryCharacteristics": ["technical_detailed"],
       "evidenceSummary": ["Asked about database optimization techniques"],
-      "confidenceLevel": "medium"
+      "confidenceLevel": "MEDIUM"
     },
     "communicationPreferences": {
-      "detailLevel": "balanced",
-      "contentDepth": "practical",
-      "responseFormat": "detailed"
+      "detailLevel": "BALANCE",
+      "contentDepth": "PRACTICAL",
+      "responseFormat": "DETAILED"
     },
     "userOverview" : "A software engineer interested in database optimization, preferring balanced practical details in a detailed format"
   },
@@ -174,12 +174,12 @@ History Extract Track
       "possibleIdentities": ["software_engineer", "system_architect"],
       "primaryCharacteristics": ["technical_detailed", "architecture_focused"],
       "evidenceSummary": ["Inquired about microservices architecture and scalability"],
-      "confidenceLevel": "medium_high"
+      "confidenceLevel": "MEDIUM_HIGH"
     },
     "communicationPreferences": {
-      "detailLevel": "comprehensive",
-      "contentDepth": "practical",
-      "responseFormat": "structured_with_examples"
+      "detailLevel": "COMPREHENSIVE",
+      "contentDepth": "PRACTICAL",
+      "responseFormat": "STRUCTURED_WITH_EXAMPLES"
     },
     "userOverview" : "A software engineer or system architect focused on microservices and scalability, preferring comprehensive practical details in structured formats with examples"
   }
@@ -197,12 +197,12 @@ Sample output:
     "possibleOccupations": ["software_engineer", "system_architect"],
     "primaryCharacteristics": ["technical_detailed", "architecture_focused"],
     "evidenceSummary": ["Used microservices terminology, requested implementation details"],
-    "confidenceLevel": "medium_high"
+    "confidenceLevel": "MEDIUM_HIGH"
   },
   "communicationPreferences": {
-    "detailLevel": "comprehensive",
-    "contentDepth": "practical",
-    "responseFormat": "structured_with_examples"
+    "detailLevel": "COMPREHENSIVE",
+    "contentDepth": "PRACTICAL",
+    "responseFormat": "STRUCTURED_WITH_EXAMPLES"
   },
   "userOverview" : "A senior software engineer or system architect who prefers comprehensive, practical details delivered in structured formats with examples, demonstrating technical depth and architectural focus"
 }
