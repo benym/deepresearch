@@ -81,7 +81,12 @@
 } 
 ```
 
-
+**短期记忆**
+`application.yml`配置 spring.ai.alibaba.deepresearch.short-term-memory.enabled: true 开启短期记忆功能
+- 会话记忆:
+  - `application.yml`配置 spring.ai.alibaba.deepresearch.conversation-memory 配置会话记忆相关信息
+- 用户角色记忆:
+  - `application.yml`配置 spring.ai.alibaba.deepresearch.user-role-memory 配置用户角色记忆相关信息
 
 ## 相关API、工具、MCP接入文档
 
@@ -185,6 +190,7 @@ Langfuse 配置
 - [yuluo-yx](https://github.com/yuluo-yx)
 - [Ken Liu](https://github.com/chickenlj)
 - [co63ox](https://github.com/co63oc)
+- [benym](https://github.com/benym)
 
 
 社区研究小组

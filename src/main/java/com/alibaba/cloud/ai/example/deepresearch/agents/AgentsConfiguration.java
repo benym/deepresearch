@@ -241,4 +241,9 @@ public class AgentsConfiguration {
 		return ragChatClientBuilder.defaultSystem(ResourceUtil.loadResourceAsString(ragPrompt)).build();
 	}
 
+	@Bean
+	public ChatClient shortMemoryAgent(ChatClient.Builder shortMemoryChatClientBuilder) {
+		return shortMemoryChatClientBuilder.build();
+	}
+
 }

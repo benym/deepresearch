@@ -17,27 +17,11 @@
 package com.alibaba.cloud.ai.example.deepresearch.config;
 
 import com.alibaba.cloud.ai.example.deepresearch.config.rag.RagProperties;
-import com.alibaba.cloud.ai.example.deepresearch.dispatcher.BackgroundInvestigationDispatcher;
-import com.alibaba.cloud.ai.example.deepresearch.dispatcher.CoordinatorDispatcher;
-import com.alibaba.cloud.ai.example.deepresearch.dispatcher.HumanFeedbackDispatcher;
-import com.alibaba.cloud.ai.example.deepresearch.dispatcher.InformationDispatcher;
-import com.alibaba.cloud.ai.example.deepresearch.dispatcher.ProfessionalKbDispatcher;
-import com.alibaba.cloud.ai.example.deepresearch.dispatcher.ResearchTeamDispatcher;
-import com.alibaba.cloud.ai.example.deepresearch.dispatcher.RewriteAndMultiQueryDispatcher;
+import com.alibaba.cloud.ai.example.deepresearch.dispatcher.*;
+import com.alibaba.cloud.ai.example.deepresearch.memory.ShortTermMemoryRepository;
 import com.alibaba.cloud.ai.example.deepresearch.model.enums.ParallelEnum;
 
-import com.alibaba.cloud.ai.example.deepresearch.node.BackgroundInvestigationNode;
-import com.alibaba.cloud.ai.example.deepresearch.node.CoderNode;
-import com.alibaba.cloud.ai.example.deepresearch.node.CoordinatorNode;
-import com.alibaba.cloud.ai.example.deepresearch.node.HumanFeedbackNode;
-import com.alibaba.cloud.ai.example.deepresearch.node.InformationNode;
-import com.alibaba.cloud.ai.example.deepresearch.node.ParallelExecutorNode;
-import com.alibaba.cloud.ai.example.deepresearch.node.PlannerNode;
-import com.alibaba.cloud.ai.example.deepresearch.node.ProfessionalKbDecisionNode;
-import com.alibaba.cloud.ai.example.deepresearch.node.ReporterNode;
-import com.alibaba.cloud.ai.example.deepresearch.node.ResearchTeamNode;
-import com.alibaba.cloud.ai.example.deepresearch.node.ResearcherNode;
-import com.alibaba.cloud.ai.example.deepresearch.node.RewriteAndMultiQueryNode;
+import com.alibaba.cloud.ai.example.deepresearch.node.*;
 import com.alibaba.cloud.ai.example.deepresearch.service.RagNodeService;
 import com.alibaba.cloud.ai.example.deepresearch.service.SessionContextService;
 import com.alibaba.cloud.ai.example.deepresearch.service.multiagent.QuestionClassifierService;
@@ -61,6 +45,7 @@ import com.alibaba.cloud.ai.toolcalling.jinacrawler.JinaCrawlerService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.memory.MessageWindowChatMemory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -82,7 +67,8 @@ import com.alibaba.cloud.ai.example.deepresearch.service.McpProviderFactory;
  */
 @Configuration
 @EnableConfigurationProperties({ DeepResearchProperties.class, PythonCoderProperties.class,
-		McpAssignNodeProperties.class, RagProperties.class, ReflectionProperties.class, SmartAgentProperties.class })
+		McpAssignNodeProperties.class, RagProperties.class, ReflectionProperties.class, SmartAgentProperties.class,
+		ShortTermMemoryProperties.class })
 public class DeepResearchConfiguration {
 
 	private static final Logger logger = LoggerFactory.getLogger(DeepResearchConfiguration.class);
@@ -109,6 +95,9 @@ public class DeepResearchConfiguration {
 	private ChatClient reflectionAgent;
 
 	@Autowired
+	private ChatClient shortMemoryAgent;
+
+	@Autowired
 	private ChatClient.Builder rewriteAndMultiQueryChatClientBuilder;
 
 	@Autowired
@@ -116,6 +105,15 @@ public class DeepResearchConfiguration {
 
 	@Autowired
 	private ReflectionProperties reflectionProperties;
+
+	@Autowired
+	private ShortTermMemoryProperties shortTermMemoryProperties;
+
+	@Autowired
+	private ShortTermMemoryRepository shortTermMemoryRepository;
+
+	@Autowired(required = false)
+	private MessageWindowChatMemory messageWindowChatMemory;
 
 	@Autowired(required = false)
 	private JinaCrawlerService jinaCrawlerService;
@@ -172,6 +170,7 @@ public class DeepResearchConfiguration {
 		KeyStrategyFactory keyStrategyFactory = () -> {
 			HashMap<String, KeyStrategy> keyStrategyHashMap = new HashMap<>();
 			// 条件边控制：跳转下一个节点
+			keyStrategyHashMap.put("short_user_role_next_node", new ReplaceStrategy());
 			keyStrategyHashMap.put("coordinator_next_node", new ReplaceStrategy());
 			keyStrategyHashMap.put("rewrite_multi_query_next_node", new ReplaceStrategy());
 			keyStrategyHashMap.put("background_investigation_next_node", new ReplaceStrategy());
@@ -222,9 +221,15 @@ public class DeepResearchConfiguration {
 
 		StateGraph stateGraph = new StateGraph("deep research", keyStrategyFactory,
 				new DeepResearchStateSerializer(OverAllState::new))
-			.addNode("coordinator", node_async(new CoordinatorNode(coordinatorAgent, sessionContextService)))
+			.addNode("short_user_role_memory",
+					node_async(new ShortUserRoleMemoryNode(shortMemoryAgent, shortTermMemoryProperties,
+							shortTermMemoryRepository)))
+			.addNode("coordinator",
+					node_async(new CoordinatorNode(coordinatorAgent, sessionContextService, messageWindowChatMemory,
+							shortTermMemoryProperties)))
 			.addNode("rewrite_multi_query",
-					node_async(new RewriteAndMultiQueryNode(rewriteAndMultiQueryChatClientBuilder)))
+					node_async(new RewriteAndMultiQueryNode(rewriteAndMultiQueryChatClientBuilder,
+							shortTermMemoryRepository, shortTermMemoryProperties)))
 			.addNode("background_investigator",
 					node_async(new BackgroundInvestigationNode(jinaCrawlerService, infoCheckService,
 							searchFilterService, questionClassifierService, searchPlatformSelectionService,
@@ -238,12 +243,15 @@ public class DeepResearchConfiguration {
 			.addNode("human_feedback", node_async(new HumanFeedbackNode()))
 			.addNode("research_team", node_async(new ResearchTeamNode()))
 			.addNode("parallel_executor", node_async(new ParallelExecutorNode(deepResearchProperties)))
-			.addNode("reporter", node_async(new ReporterNode(reporterAgent, reportService, sessionContextService)));
+			.addNode("reporter", node_async(new ReporterNode(reporterAgent, reportService, sessionContextService,
+					messageWindowChatMemory, shortTermMemoryProperties)));
 
 		// 添加并行节点块
 		configureParallelNodes(stateGraph);
 
-		stateGraph.addEdge(START, "coordinator")
+		stateGraph.addEdge(START, "short_user_role_memory")
+			.addConditionalEdges("short_user_role_memory", edge_async(new ShortUserRoleMemoryDispatcher()),
+					Map.of("coordinator", "coordinator", END, END))
 			.addConditionalEdges("coordinator", edge_async(new CoordinatorDispatcher()),
 					Map.of("rewrite_multi_query", "rewrite_multi_query", END, END))
 			.addConditionalEdges("rewrite_multi_query", edge_async(new RewriteAndMultiQueryDispatcher()),

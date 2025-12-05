@@ -16,17 +16,22 @@
 
 package com.alibaba.cloud.ai.example.deepresearch.node;
 
+import com.alibaba.cloud.ai.example.deepresearch.config.ShortTermMemoryProperties;
+import com.alibaba.cloud.ai.example.deepresearch.memory.ShortTermMemoryRepository;
 import com.alibaba.cloud.ai.example.deepresearch.util.StateUtil;
 import com.alibaba.cloud.ai.graph.OverAllState;
 import com.alibaba.cloud.ai.graph.action.NodeAction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.rag.Query;
 import org.springframework.ai.rag.preretrieval.query.expansion.MultiQueryExpander;
 import org.springframework.ai.rag.preretrieval.query.expansion.QueryExpander;
+import org.springframework.ai.rag.preretrieval.query.transformation.CompressionQueryTransformer;
 import org.springframework.ai.rag.preretrieval.query.transformation.QueryTransformer;
 import org.springframework.ai.rag.preretrieval.query.transformation.RewriteQueryTransformer;
+import org.springframework.util.CollectionUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -48,15 +53,21 @@ public class RewriteAndMultiQueryNode implements NodeAction {
 
 	private final QueryTransformer queryTransformer;
 
+	private final ShortTermMemoryRepository shortTermMemoryRepository;
+
+	private final ShortTermMemoryProperties shortTermMemoryProperties;
+
 	ChatClient.Builder rewriteAndMultiQueryAgentBuilder;
 
-	public RewriteAndMultiQueryNode(ChatClient.Builder rewriteAndMultiQueryAgentBuilder) {
+	public RewriteAndMultiQueryNode(ChatClient.Builder rewriteAndMultiQueryAgentBuilder,
+			ShortTermMemoryRepository shortTermMemoryRepository, ShortTermMemoryProperties shortTermMemoryProperties) {
 		this.rewriteAndMultiQueryAgentBuilder = rewriteAndMultiQueryAgentBuilder;
-
 		// 查询重写
 		this.queryTransformer = RewriteQueryTransformer.builder()
 			.chatClientBuilder(rewriteAndMultiQueryAgentBuilder)
 			.build();
+		this.shortTermMemoryRepository = shortTermMemoryRepository;
+		this.shortTermMemoryProperties = shortTermMemoryProperties;
 	}
 
 	@Override
@@ -68,6 +79,17 @@ public class RewriteAndMultiQueryNode implements NodeAction {
 		String queryText = StateUtil.getQuery(state);
 		assert queryText != null;
 		Query query = Query.builder().text(queryText).build();
+		if (shortTermMemoryProperties.isEnabled()) {
+			List<Message> recentUserMessages = shortTermMemoryRepository
+				.getRecentUserMessages(StateUtil.getSessionId(state), null);
+			if (!CollectionUtils.isEmpty(recentUserMessages)) {
+				CompressionQueryTransformer compressionQueryTransformer = CompressionQueryTransformer.builder()
+					.chatClientBuilder(rewriteAndMultiQueryAgentBuilder)
+					.build();
+				Query queryWithHistory = Query.builder().text(queryText).history(recentUserMessages).build();
+				query = compressionQueryTransformer.transform(queryWithHistory);
+			}
+		}
 		// 查询重写
 		Query rewriteQuery = queryTransformer.transform(query);
 

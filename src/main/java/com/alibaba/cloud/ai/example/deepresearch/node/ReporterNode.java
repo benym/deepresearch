@@ -16,6 +16,7 @@
 
 package com.alibaba.cloud.ai.example.deepresearch.node;
 
+import com.alibaba.cloud.ai.example.deepresearch.config.ShortTermMemoryProperties;
 import com.alibaba.cloud.ai.example.deepresearch.model.enums.StreamNodePrefixEnum;
 import com.alibaba.cloud.ai.example.deepresearch.model.enums.ParallelEnum;
 import com.alibaba.cloud.ai.example.deepresearch.model.SessionHistory;
@@ -24,6 +25,7 @@ import com.alibaba.cloud.ai.example.deepresearch.model.req.GraphId;
 import com.alibaba.cloud.ai.example.deepresearch.service.ReportService;
 import com.alibaba.cloud.ai.example.deepresearch.service.SessionContextService;
 import com.alibaba.cloud.ai.example.deepresearch.util.StateUtil;
+import com.alibaba.cloud.ai.example.deepresearch.util.TemplateUtil;
 import com.alibaba.cloud.ai.example.deepresearch.util.convert.FluxConverter;
 import com.alibaba.cloud.ai.graph.GraphResponse;
 import com.alibaba.cloud.ai.graph.OverAllState;
@@ -33,6 +35,8 @@ import com.alibaba.cloud.ai.graph.streaming.StreamingOutput;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.memory.MessageWindowChatMemory;
+import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatResponse;
@@ -61,13 +65,20 @@ public class ReporterNode implements NodeAction {
 
 	private final SessionContextService sessionContextService;
 
+	private final MessageWindowChatMemory messageWindowChatMemory;
+
+	private final ShortTermMemoryProperties shortTermMemoryProperties;
+
 	private static final String RESEARCH_FORMAT = "# Research Requirements\n\n## Task\n\n{0}\n\n## Description\n\n{1}";
 
 	public ReporterNode(ChatClient reporterAgent, ReportService reportService,
-			SessionContextService sessionContextService) {
+			SessionContextService sessionContextService, MessageWindowChatMemory messageWindowChatMemory,
+			ShortTermMemoryProperties shortTermMemoryProperties) {
 		this.reporterAgent = reporterAgent;
 		this.reportService = reportService;
 		this.sessionContextService = sessionContextService;
+		this.messageWindowChatMemory = messageWindowChatMemory;
+		this.shortTermMemoryProperties = shortTermMemoryProperties;
 	}
 
 	@Override
@@ -82,7 +93,7 @@ public class ReporterNode implements NodeAction {
 
 		// 添加消息
 		List<Message> messages = new ArrayList<>();
-
+		TemplateUtil.addShortUserRoleMemory(messages, state);
 		// 添加背景调查的信息
 		List<String> backgroundInvestigationResults = state.value("background_investigation_results",
 				(List<String>) null);
@@ -134,6 +145,9 @@ public class ReporterNode implements NodeAction {
 				try {
 					GraphId graphId = new GraphId(sessionId, threadId);
 					String userQuery = state.value("query", String.class).orElse("UNKNOWN");
+					if (shortTermMemoryProperties.isEnabled()) {
+						messageWindowChatMemory.add(sessionId, new AssistantMessage(finalReport));
+					}
 					sessionContextService.addSessionHistory(graphId,
 							SessionHistory.builder().graphId(graphId).userQuery(userQuery).report(finalReport).build());
 					logger.info("Report saved successfully, Thread ID: {}", threadId);

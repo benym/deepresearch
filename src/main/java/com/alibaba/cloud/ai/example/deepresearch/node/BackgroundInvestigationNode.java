@@ -23,6 +23,7 @@ import com.alibaba.cloud.ai.example.deepresearch.service.SearchFilterService;
 import com.alibaba.cloud.ai.example.deepresearch.service.SearchInfoService;
 import com.alibaba.cloud.ai.example.deepresearch.service.SessionContextService;
 import com.alibaba.cloud.ai.example.deepresearch.service.multiagent.SearchPlatformSelectionService;
+import com.alibaba.cloud.ai.example.deepresearch.util.TemplateUtil;
 import com.alibaba.cloud.ai.example.deepresearch.util.multiagent.AgentIntegrationUtil;
 import com.alibaba.cloud.ai.example.deepresearch.util.multiagent.SmartAgentUtil;
 import com.alibaba.cloud.ai.example.deepresearch.service.multiagent.ToolCallingSearchService;
@@ -107,7 +108,8 @@ public class BackgroundInvestigationNode implements NodeAction {
 			List<Map<String, String>> searchResults = resultsList.get(i);
 
 			String query = queries.get(i);
-
+			List<Message> messageList = new ArrayList<>();
+			TemplateUtil.addShortUserRoleMemory(messageList, state);
 			Message messages = new UserMessage(
 					"搜索问题:" + query + "\n" + "以下是搜索结果：\n\n" + searchResults.stream().map(r -> {
 						return String.format("标题: %s\n权重: %s\n内容: %s\nurl: %s\n", r.get("title"), r.get("weight"),
@@ -124,8 +126,9 @@ public class BackgroundInvestigationNode implements NodeAction {
 			else {
 				lastReportMessage = new AssistantMessage("这是用户的第一次询问，因此没有上下文。");
 			}
-
-			String content = backgroundAgent.prompt().messages(lastReportMessage, messages).call().content();
+			messageList.add(lastReportMessage);
+			messageList.add(messages);
+			String content = backgroundAgent.prompt().messages(messageList).call().content();
 
 			backgroundResults.add(content);
 

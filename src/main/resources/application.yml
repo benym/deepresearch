@@ -118,6 +118,25 @@ spring:
         reflection:
           enabled: true
           max-attempts: 1
+        # 短期记忆配置
+        short-term-memory:
+          enabled: true
+          # 会话记忆配置
+          conversation-memory:
+            # 最长保留会话长度
+            max-messages: 100
+          # 用户角色记忆配置
+          user-role-memory:
+            # 用户角色短期记忆引导模型生成的范围
+            guide-scope: every
+            # 判定需要更新记忆时相似度阈值，范围0~1，默认0.8
+            update-similarity-threshold : 0.8
+            # 参考历史用户提问的条数
+            history-user-messages-num: 10
+          # 记忆类型
+          memory-type: in-memory
+
+
 
 logging:
   level:

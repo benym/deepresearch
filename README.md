@@ -87,6 +87,12 @@ video：https://yingziimage.oss-cn-beijing.aliyuncs.com/video/deep_research.mov
 } 
 ```
 
+**Short Term Memory**
+In `application.yml` set spring.ai.alibaba.deepresearch.short-term-memory.enabled: true, enable short-term memory
+- Conversation Memory:
+    - In `application.yml` set spring.ai.alibaba.deepresearch.conversation-memory, configuration for conversation memory
+- User Role Memory:
+    - In `application.yml` set spring.ai.alibaba.deepresearch.user-role-memory, configuration for user role memory
 
 ## Related APIs, Tools, and MCP Integration Docs
 
@@ -189,7 +195,7 @@ Thanks to the following contributors for improving this project (unordered):
 - [yuluo-yx](https://github.com/yuluo-yx)
 - [Ken Liu](https://github.com/chickenlj)
 - [co63ox](https://github.com/co63oc)
-
+- [benym](https://github.com/benym)
 
 Community Study Group
 
