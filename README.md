@@ -164,7 +164,7 @@ curl --location 'http://localhost:8080/chat/stream' \
 
 ## 📚 Reference Documentation
 
-- [Full Configuration Reference](assistant-agent-start/src/main/resources/application-reference.yml)
+- [Full Configuration Reference](docs/FULL_CONFIG.md#configuration)
 - [Spring AI Alibaba Documentation](https://github.com/alibaba/spring-ai-alibaba)
 
 ## 🤝 Join Community & Contributing

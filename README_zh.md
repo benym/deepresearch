@@ -163,7 +163,7 @@ curl --location 'http://localhost:8080/chat/stream' \
 
 ## 📚 参考文档
 
-- [完整配置参考](assistant-agent-start/src/main/resources/application-reference.yml)
+- [完整配置参考](docs/FULL_CONFIG-zh.md#配置)
 - [Spring AI Alibaba 文档](https://github.com/alibaba/spring-ai-alibaba)
 
 ## 🤝 加入社区 & 贡献
