@@ -171,7 +171,9 @@ curl --location 'http://localhost:8080/chat/stream' \
 
 Contributions are welcome! Please refer to [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
-![](./imgs/qrcode.png)
+<div align="center">
+    <img src="./imgs/qrcode.png" alt="community"/>
+</div>
 
 ## 📄 License
 

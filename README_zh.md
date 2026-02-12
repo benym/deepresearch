@@ -169,8 +169,9 @@ curl --location 'http://localhost:8080/chat/stream' \
 ## 🤝 加入社区 & 贡献
 
 欢迎贡献！请参阅 [CONTRIBUTING](CONTRIBUTING-zh.md) 了解指南。
-
-![](./imgs/qrcode.png)
+<div align="center">
+    <img src="./imgs/qrcode.png" alt="社区"/>
+</div>
 
 ## 📄 许可证
 
