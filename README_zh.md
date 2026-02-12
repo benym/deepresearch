@@ -18,7 +18,7 @@
 - 🌐**Online Search**: 集成Tavily、Jina、阿里云 AI Search等多源搜索服务
 - 📖**Hybrid RAG**: 结合向量与关键词检索，实现全面信息获取
 - 🔄**Reflection**: 智能体自主反思，持续优化输出质量
-- 🚶‍♂️**HITL**: 引入人机交互反馈，增强可控性
+- 🚶‍♂️**HITL**: 支持人机交互反馈，增强可控性
 - 🧬**Self-evolution Memory**: 基于交互反馈的记忆结构与内容自进化用户角色记忆
 - 🖇️**MCP Allocation**: 支持多智能体场景下的MCP分配
 - 🔒**Secure Sandbox**: Docker沙箱环境下的安全Python代码执行
@@ -51,7 +51,7 @@ DeepResearch/
 
 ## 🧩 系统架构
 
-
+![](imgs/deepresearch-architecture-zh.gif)
 
 [更多图例](docs/ARCHITECTURE-zh.md)
 
@@ -168,7 +168,7 @@ curl --location 'http://localhost:8080/chat/stream' \
 
 ## 🤝 加入社区 & 贡献
 
-欢迎贡献！请参阅 [CONTRIBUTING-zh.md](CONTRIBUTING-zh.md) 了解指南。
+欢迎贡献！请参阅 [CONTRIBUTING](CONTRIBUTING-zh.md) 了解指南。
 
 ![](./imgs/qrcode.png)
 
@@ -181,3 +181,9 @@ curl --location 'http://localhost:8080/chat/stream' \
 感谢如下贡献人员的付出，逐渐完善本项目，其 Github 账号如下（排名顺序不分先后）：
 
 [yingzi](https://github.com/GTyingzi)、[zhouyou](https://github.com/zhouyou9505)、[NOBODY](https://github.com/SCMRCORE)、[xiaohai-78](https://github.com/xiaohai-78)、[VLSMB](https://github.com/VLSMB)、[disaster1-tesk](https://github.com/disaster1-tesk)、[Allen Hu](https://github.com/big-mouth-cn)、[Makoto](https://github.com/zxuexingzhijie)、[sixiyida](https://github.com/sixiyida)、[Gfangxin](https://github.com/Gfangxin)、[AliciaHu](https://github.com/AliciaHu)、[swl](https://github.com/hbsjz-swl)、[huangzhen](https://github.com/james-huangzhen)、[Tfh-Yqf](https://github.com/Tfh-Yqf)、[anyin-xyz](https://github.com/anyin-xyz)、[zhou youkang](https://github.com/mengnankkkk)、[supermonkeyguys](https://github.com/supermonkeyguys)、[yuluo-yx](https://github.com/yuluo-yx)、[Ken Liu](https://github.com/chickenlj)、[co63ox](https://github.com/co63oc)、[benym](https://github.com/benym)
+
+---
+
+<div align="center">
+    Made with ❤️ by Spring AI Alibaba DeepResearch Team
+</div>

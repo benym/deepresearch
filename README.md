@@ -51,6 +51,7 @@ DeepResearch/
 
 ## 🧩 System Architecture
 
+![](imgs/deepresearch-architecture.gif)
 
 [More illustrations](docs/ARCHITECTURE.md)
 
@@ -181,3 +182,9 @@ This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENS
 Thanks to the following contributors for improving this project (unordered):
 
 [yingzi](https://github.com/GTyingzi)、[zhouyou](https://github.com/zhouyou9505)、[NOBODY](https://github.com/SCMRCORE)、[xiaohai-78](https://github.com/xiaohai-78)、[VLSMB](https://github.com/VLSMB)、[disaster1-tesk](https://github.com/disaster1-tesk)、[Allen Hu](https://github.com/big-mouth-cn)、[Makoto](https://github.com/zxuexingzhijie)、[sixiyida](https://github.com/sixiyida)、[Gfangxin](https://github.com/Gfangxin)、[AliciaHu](https://github.com/AliciaHu)、[swl](https://github.com/hbsjz-swl)、[huangzhen](https://github.com/james-huangzhen)、[Tfh-Yqf](https://github.com/Tfh-Yqf)、[anyin-xyz](https://github.com/anyin-xyz)、[zhou youkang](https://github.com/mengnankkkk)、[supermonkeyguys](https://github.com/supermonkeyguys)、[yuluo-yx](https://github.com/yuluo-yx)、[Ken Liu](https://github.com/chickenlj)、[co63ox](https://github.com/co63oc)、[benym](https://github.com/benym)
+
+---
+
+<div align="center">
+    Made with ❤️ by Spring AI Alibaba DeepResearch Team
+</div>
