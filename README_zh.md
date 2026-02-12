@@ -1,118 +1,110 @@
-本项目基于 spring-ai-alibaba-graph 实现深度研究
+# DeepResearch
 
-[English Version](README.md)
+[中文](README_zh.md) | [English](README.md) 
 
-## 架构图
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
+[![Java](https://img.shields.io/badge/Java-17%2B-orange.svg)](https://openjdk.org/)
+[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.4-green.svg)](https://spring.io/projects/spring-boot)
+[![Spring AI](https://img.shields.io/badge/Spring%20AI-1.0.0-blueviolet.svg)](https://spring.io/projects/spring-ai)
 
-[查看原图](./imgs/deepresearch-workflow.png)
+## 📖 介绍
 
-<img src="./imgs/deepresearch-workflow.png" alt="架构图" style="width:1400px; max-width:100%; height:auto; display:block; margin:0 auto;" />
+**DeepResearch**是基于**Spring AI Alibaba Graph**构建的智能研究Agent，旨在攻克复杂研究任务。它采用**Multi-Agent**协作模式，支持动态任务规划与执行。系统集成了多源在线搜索与Hybrid RAG技术，配合Secure Sandbox执行Python代码，实现高效的数据分析。通过Reflection、HITL及Self-evolution Memory，Agent能持续自我优化，最终输出高质量的研究报告，提供深度洞察。
 
-> 上图展示了 deepresearch 的核心模块分层与主要调用关系。
+## ✨ Technical Features
 
-## 主要流程图
+- 📋**Plan and Execute**: 复杂问题的动态规划与自动执行
+- 🤖**Multi Agent**: 多智能体（如Researcher, Coder）协同作业
+- 🌐**Online Search**: 集成Tavily、Jina、阿里云 AI Search等多源搜索服务
+- 📖**Hybrid RAG**: 结合向量与关键词检索，实现全面信息获取
+- 🔄**Reflection**: 智能体自主反思，持续优化输出质量
+- 🚶‍♂️**HITL**: 引入人机交互反馈，增强可控性
+- 🧬**Self-evolution Memory**: 基于交互反馈的记忆结构与内容自进化用户角色记忆
+- 🖇️**MCP Allocation**: 支持多智能体场景下的MCP分配
+- 🔒**Secure Sandbox**: Docker沙箱环境下的安全Python代码执行
+- 📊**Report Generation**: 支持HTML报告预览，Markdown、PDF等多种格式的报告生成
 
-![主要流程图](./imgs/flow.png)
+## 🎋 项目架构
 
-> 上图展示了用户请求在 deepresearch 系统中的主要流转流程。
-
-<video width="640" height="360" controls>
-<source src="../deepresearh-display.mp4" type="video/mp4">
-</video>
-
-
-## 配置
-
-### 必配
-
-- DashScope API: `${AI_DASHSCOPE_API_KEY}`
-- TavilySearch API: `${TAVILY_API_KEY}`
-- 报告导出路径: `${AI_DEEPRESEARCH_EXPORT_PATH}`
-  TIP：不填会存储在项目根路径下
-
-### 选配
-
-**搜索服务(默认tavily)**
-
-- Jina API: `${JINA_API_KEY}`
-- aliyunaisearch:
-  - api-key: `${ALIYUN_AI_SEARCH_API_KEY}`
-  - base-url: `${ALIYUN_AI_SEARCH_BASE_URL}`
-
-**存储选配(默认内存)** 
-
-- redis:`${REDIS-PASSWORD}`
-  TIP：默认localhost:6379
-
-**编程节点(给大模型提供编程能力)**
-
-- Coder节点的Python执行器跑在Docker容器中，需要额外为其配置Docker信息
-  - 在配置文件的`spring.ai.alibaba.deepresearch.python-coder.docker-host`字段中设置DockerHost，默认为`unix:///var/run/docker.sock`。
-  本项目需要使用`python:3-slim`镜像创建临时容器，也可以自己定制包含一些常用的第三方库的镜像，第三方库需要安装在镜像的`/app/dependency`文件夹里，在配置文件中设置`spring.ai.alibaba.deepresearch.python-coder.image-name`的值指定镜像名称。
-
-**RAG**
-
-- ElasticSearch: 
-    - `application.yml`配置 spring.ai.alibaba.deepresearch.rag.enabled: true
-    - `application.yml`配置 spring.ai.alibaba.deepresearch.rag.vector-store-type: elasticsearch
-    - `application.yml`配置 spring.ai.alibaba.deepresearch.rag.elasticsearch 配置 ES相关信息
-    - 启动ES中间件 ， 在spring-ai-alibaba-deepresearch目录下执行以下命令
-        ```shell
-        docker compose -f docker-compose-middleware.yml up -d
-        ```
-    - 在【知识库管理】页面新增知识库，并且上传对应的文档到 ES
-
-**MCP服务(待完善)**
-
-- 高德地图MCP
-
-```json
-{
-    "researchAgent": {
-        "mcp-servers": [
-            {
-                "url": "https://mcp.amap.com?key=${AI_DASHSCOPE_API_KEY}",
-                "sse-endpoint": null,
-                "description": "这是一个高德地图服务",
-                "enabled": false
-            }
-        ]
-    }
-} 
+```
+DeepResearch/
+├──  ├── src/
+│    ├── agents                          # 多Agent初始化，MCP分配，可观测初始化
+│    ├── config                          # Graph图构建，项目Config配置类
+│    ├── controller                      # Http接口端点
+│    ├── dispatcher                      # Graph EdgeAction
+│    ├── model                           # 基础项目实体
+│    ├── node                            # Graph关键node定义
+│    ├── rag                             # RAG核心实现
+│    ├── repository                      # 模型配置加载
+│    ├── serializer                      # 消息序列化实现
+│    ├── service                         # 业务代码实现
+│    ├── tool                            # Agent Tool定义
+│    ├── util                            # 项目util
+│    └── DeepResearchApplication         # 启动类
+├──  ├── resource/                  
+│    ├── prompts                         # 核心prompt
+│	 ├── mcp-config.json                 # Agent Mcp配置
+│    ├── model-config.json               # 多Agent模型配置
+├──  └── website-weight-config.json      # 搜索引擎权重配置
 ```
 
-**短期记忆**
-`application.yml`配置 spring.ai.alibaba.deepresearch.short-term-memory.enabled: true 开启短期记忆功能
-- 会话记忆:
-  - `application.yml`配置 spring.ai.alibaba.deepresearch.conversation-memory 配置会话记忆相关信息
-- 用户角色记忆:
-  - `application.yml`配置 spring.ai.alibaba.deepresearch.user-role-memory 配置用户角色记忆相关信息
-
-## 相关API、工具、MCP接入文档
-
-- DashScope 阿里云百炼：https://bailian.console.aliyun.com
-
-- tavily API文档：https://docs.tavily.com/documentation/api-reference/endpoint/search
-- Jina API文档：https://jina.ai/reader
-- 高德地图MCP：https://lbs.amap.com/api/mcp-server/gettingstarted#t1
+## 🧩 系统架构
 
 
 
-## 项目启动
-### 快速启动
-右键点击DeepResearchApplication类的Run命令启动
+[更多图例](docs/ARCHITECTURE-zh.md)
 
-### maven启动
-在spring-ai-alibaba-deepresearch项目根目录下，使用maven启动项目
-```angular2html
+## 🔍 运行示例
+
+[演示视频](https://yingziimage.oss-cn-beijing.aliyuncs.com/video/deep_research.mov)
+
+![](https://yingziimage.oss-cn-beijing.aliyuncs.com/img/image-20251001121713795.png)
+
+![](./imgs/deepresearch-system.png)
+
+## 🚀 快速开始
+
+### Prerequisites
+
+- Java 17+
+- Maven 3.6+
+- DashScope API Key
+
+### 1. 克隆并构建
+
+```bash
+git clone https://github.com/spring-ai-alibaba/deepresearch.git
+cd deepresearch
+mvn clean install -DskipTests
+```
+
+### 2. 配置API Key
+```bash
+export AI_DASHSCOPE_API_KEY=your-api-key-here
+```
+
+### 3. 启动应用
+
+#### 从项目启动
+**后端:**
+
+```bash
+cd deepresearch
 mvn spring-boot:run
 ```
+**前端**:
 
-
-### Docker版启动
-- 在deepresearch项目工程目录下执行构建命令，构建docker镜像大约要花费5分钟左右，具体时间取决于网络速度
+```bash
+cd ui-vue3
+pnpm install
+npm run dev
+```
+#### Docker版启动
+- 在deepresearch项目工程目录下执行构建命令，构建docker镜像大约要花费5分钟左右
 ```shell
-docker build -t alibaba-deepresearch:v1.0 . 
+cd deepresearch
+docker build -t alibaba-deepresearch:v1.0
 ```
 - 构建完成后，执行docker run命令启动镜像，设置环境变量
 ```shell
@@ -124,15 +116,37 @@ docker run -d \
   -p 8080:8080 \
   alibaba-deepresearch:v1.0
 ```
-- 或者使用docker-compose up命令启动,当前容器包括Redis，ElasticSearch,deep research app.
+- 或者使用docker-compose up命令启动,当前容器包括Redis，ElasticSearch, DeepResearch App.
 ```shell
   docker-compose up
 ```
-> **注意**：
+> 💡**注意**：
 > - .env文件中设置api-key信息
 > - dockerConfig目录下有对应应用的配置文件，也可在配置文件中设置key及相关配置信息
 
-**测试用例**
+### 4. 配置项
+
+- [API KEY](docs/FULL_CONFIG-zh.md#api-key)
+- [Search Services](docs/FULL_CONFIG-zh.md#搜索服务默认tavily)
+- [Storage Options](docs/FULL_CONFIG-zh.md#存储选配默认内存)
+- [Coding Node](docs/FULL_CONFIG-zh.md#编程节点给大模型提供编程能力)
+- [RAG](docs/FULL_CONFIG-zh.md#rag)
+- [MCP Service (WIP)](docs/FULL_CONFIG-zh.md#mcp服务待完善)
+- [Short Term Memory](docs/FULL_CONFIG-zh.md#短期记忆)
+
+### 5. Debug和可观测
+
+支持集成Langfuse体系可观测，相关配置项可[查看文档](docs/FULL_CONFIG-zh.md#可观测)
+
+### 相关API文档
+
+- [DashScope (Alibaba Bailian)](https://bailian.console.aliyun.com)
+- [Tavily API Docs](https://docs.tavily.com/documentation/api-reference/endpoint/search)
+- [Jina API Docs](https://jina.ai/reader)
+- [AMap MCP Docs](https://lbs.amap.com/api/mcp-server/gettingstarted#t1)
+
+## 测试用例
+
 相关请求可见：[DeepResearch.http](DeepResearch.http)
 
 ```curl
@@ -147,52 +161,23 @@ curl --location 'http://localhost:8080/chat/stream' \
 }'
 ```
 
-**调试与观测**
+## 📚 参考文档
 
-Langfuse 配置
+- [完整配置参考](assistant-agent-start/src/main/resources/application-reference.yml)
+- [Spring AI Alibaba 文档](https://github.com/alibaba/spring-ai-alibaba)
 
-#### 使用 Langfuse 云端服务
-1. 在 [https://cloud.langfuse.com](https://cloud.langfuse.com) 注册账户
-2. 创建新项目
-3. 导航到 **Settings** → **API Keys**
-4. 生成新的 API 密钥对（公钥和私钥）
-5. 将凭据编码为 Base64：
-   ```bash
-   echo -n "public_key:secret_key" | base64
-   ```
-   ```Windows PowerShell
-   [System.Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes("public_key:secret_key"))
-   ```
-6. yml文件中选择对应的endpoint，将编码后的字符串作为环境变量 `YOUR_BASE64_ENCODED_CREDENTIALS`
+## 🤝 加入社区 & 贡献
 
-参考： https://langfuse.com/docs/opentelemetry/get-started
+欢迎贡献！请参阅 [CONTRIBUTING-zh.md](CONTRIBUTING-zh.md) 了解指南。
+
+![](./imgs/qrcode.png)
+
+## 📄 许可证
+
+本项目采用 Apache License 2.0 许可证 - 详见 [LICENSE](LICENSE) 文件。
 
 ## Contributors
 
 感谢如下贡献人员的付出，逐渐完善本项目，其 Github 账号如下（排名顺序不分先后）：
-- [yingzi](https://github.com/GTyingzi)
-- [zhouyou](https://github.com/zhouyou9505)
-- [NOBODY](https://github.com/SCMRCORE)
-- [xiaohai-78](https://github.com/xiaohai-78)
-- [VLSMB](https://github.com/VLSMB)
-- [disaster1-tesk](https://github.com/disaster1-tesk)
-- [Allen Hu](https://github.com/big-mouth-cn)
-- [Makoto](https://github.com/zxuexingzhijie)
-- [sixiyida](https://github.com/sixiyida)
-- [Gfangxin](https://github.com/Gfangxin)
-- [AliciaHu](https://github.com/AliciaHu)
-- [swl](https://github.com/hbsjz-swl)
-- [huangzhen](https://github.com/james-huangzhen)
-- [Tfh-Yqf](https://github.com/Tfh-Yqf)
-- [anyin-xyz](https://github.com/anyin-xyz)
-- [zhou youkang](https://github.com/mengnankkkk)
-- [supermonkeyguys](https://github.com/supermonkeyguys)
-- [yuluo-yx](https://github.com/yuluo-yx)
-- [Ken Liu](https://github.com/chickenlj)
-- [co63ox](https://github.com/co63oc)
-- [benym](https://github.com/benym)
 
-
-社区研究小组
-![主要流程图](./imgs/qrcode.png)
-
+[yingzi](https://github.com/GTyingzi)、[zhouyou](https://github.com/zhouyou9505)、[NOBODY](https://github.com/SCMRCORE)、[xiaohai-78](https://github.com/xiaohai-78)、[VLSMB](https://github.com/VLSMB)、[disaster1-tesk](https://github.com/disaster1-tesk)、[Allen Hu](https://github.com/big-mouth-cn)、[Makoto](https://github.com/zxuexingzhijie)、[sixiyida](https://github.com/sixiyida)、[Gfangxin](https://github.com/Gfangxin)、[AliciaHu](https://github.com/AliciaHu)、[swl](https://github.com/hbsjz-swl)、[huangzhen](https://github.com/james-huangzhen)、[Tfh-Yqf](https://github.com/Tfh-Yqf)、[anyin-xyz](https://github.com/anyin-xyz)、[zhou youkang](https://github.com/mengnankkkk)、[supermonkeyguys](https://github.com/supermonkeyguys)、[yuluo-yx](https://github.com/yuluo-yx)、[Ken Liu](https://github.com/chickenlj)、[co63ox](https://github.com/co63oc)、[benym](https://github.com/benym)
