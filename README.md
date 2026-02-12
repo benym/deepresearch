@@ -169,7 +169,7 @@ curl --location 'http://localhost:8080/chat/stream' \
 
 ## 🤝 Join Community & Contributing
 
-Contributions are welcome! Please refer to [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+Contributions are welcome! Please refer to [CONTRIBUTING](CONTRIBUTING.md) for guidelines.
 
 <div align="center">
     <img src="./imgs/qrcode.png" alt="community"/>
